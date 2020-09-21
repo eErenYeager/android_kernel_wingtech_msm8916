@@ -9,13 +9,6 @@ obj-y += broadcast/
 obj-$(CONFIG_DVB_MPQ) += dvb/
 ifeq ($(CONFIG_WT88047_CAMERA),y)
 obj-$(CONFIG_MSMB_CAMERA) += camera_wt88047_v2/
-else
+endif
 obj-$(CONFIG_MSMB_CAMERA) += camera_v2/
-endif
-ifeq ($(CONFIG_MSMB_CAMERA_DEFAULT),y)
-obj-$(CONFIG_MSMB_CAMERA) += camera_v2/
-endif
-ifeq ($(CONFIG_OPPO_CAMERA_51),y)
-obj-$(CONFIG_MSMB_CAMERA) += camera_v2_oppo_51/
-endif
 obj-$(CONFIG_MSM_VPU) += vpu/
