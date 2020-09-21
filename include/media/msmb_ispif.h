@@ -1,7 +1,3 @@
-#ifdef CONFIG_OPPO_CAMERA_51
-#include <media/msmb_ispif_oppo_51.h>
-#else
-
 #ifndef MSM_CAM_ISPIF_H
 #define MSM_CAM_ISPIF_H
 
@@ -79,11 +75,11 @@ struct msm_ispif_params_entry {
 	enum msm_ispif_vfe_intf vfe_intf;
 	enum msm_ispif_intftype intftype;
 	int num_cids;
+
 #ifdef CONFIG_WT88047_CAMERA
 	enum msm_ispif_cid cids[3];
-#else
-	enum msm_ispif_cid cids[MAX_CID_CH_V2];
 #endif
+	enum msm_ispif_cid cids[3];
 	enum msm_ispif_csid csid;
 	int crop_enable;
 	uint16_t crop_start_pixel;
@@ -134,5 +130,3 @@ struct ispif_cfg_data {
 	_IOWR('V', BASE_VIDIOC_PRIVATE, struct ispif_cfg_data)
 
 #endif /* MSM_CAM_ISPIF_H */
-
-#endif
