@@ -1,38 +1,94 @@
-#!/bin/bash
+ #
+ # Copyright © 2016, Varun Chitre "varun.chitre15" <varun.chitre15@gmail.com>
+ # Copyright © 2016, Ayush Rathore "AyushR1" <ayushrathore12501@gmail.com>
+ # If Anyone Use this Scrips Maintain Proper Credits
+ #
+ # This software is licensed under the terms of the GNU General Public
+ # License version 2, as published by the Free Software Foundation, and
+ # may be copied, distributed, and modified under those terms.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # Please maintain this if you use this script or any part of it
+ # 
+ # AR_Beast kernel Build script
+KERNEL_DIR=$PWD
+KERN_IMG=$KERNEL_DIR/arch/arm64/boot/Image
+DTBTOOL=$KERNEL_DIR/tools/dtbToolCM
+FINAL_KERNEL_ZIP=Alienkernel-$(date +"%Y%m%d-%T")-tomato.zip
+ZIP_MAKER_DIR=$KERNEL_DIR/anykernel
+VERSION=7
+
 BUILD_START=$(date +"%s")
-tcdir=${HOME}/android/TOOLS/GCC
+blue='\033[0;34m'
+cyan='\033[0;36m'
+yellow='\033[0;33m'
+red='\033[0;31m'
+nocol='\033[0m'
 
-[ -d "out" ] && rm -rf out && mkdir -p out || mkdir -p out
+export CROSS_COMPILE="/home/abhishekt295/los17/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
+export ARCH=arm64
+export SUBARCH=arm64
+export KBUILD_BUILD_USER="alienabhishek"
+export KBUILD_BUILD_HOST="frictionless_machine"
+#STRIP="/home/abhishek/UBERTC/bin/aarch64-linux-android-strip"
+#MODULES_DIR=$KERNEL_DIR/drivers/staging/prima/
 
-[ -d $tcdir ] && \
-echo "ARM64 TC Present." || \
-echo "ARM64 TC Not Present. Downloading..." | \
-git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 $tcdir/los-4.9-64
+compile_kernel ()
+{
+echo -e "$blue***********************************************"
+echo "          Compiling AR_Beast™          "
+echo -e "***********************************************$nocol"
+rm -f $KERN_IMG
+make lineageos_tomato_defconfig  -j$(nproc --all)
+make Image -j$(nproc --all)
+#make modules -j$(nproc --all)
+make dtbs -j$(nproc --all)
+if ! [ -a $KERN_IMG ];
+then
+echo -e "$red Kernel Compilation failed! Fix the errors! $nocol"
+exit 1
+fi
+$DTBTOOL -2 -o $KERNEL_DIR/arch/arm64/boot/dt.img -s 2048 -p $KERNEL_DIR/scripts/dtc/ $KERNEL_DIR/arch/arm/boot/dts/
+}
 
-[ -d $tcdir ] && \
-echo "ARM32 TC Present." || \
-echo "ARM32 TC Not Present. Downloading..." | \
-git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 $tcdir/los-4.9-32
-
-make O=out ARCH=arm64 lineageos_a37f_defconfig
-
-PATH="$tcdir/los-4.9-64/bin:$tcdir/los-4.9-32/bin:${PATH}" \
-make    O=out \
-        ARCH=arm64 \
-        CC="ccache $tcdir/los-4.9-64/bin/aarch64-linux-android-gcc" \
-        CROSS_COMPILE=aarch64-linux-android- \
-        CROSS_COMPILE_ARM32=arm-linux-androideabi- \
-        CONFIG_NO_ERROR_ON_MISMATCH=y \
-        CONFIG_DEBUG_SECTION_MISMATCH=y \
-        -j$(nproc --all) || exit
-
-cp out/arch/arm64/boot/Image anykernel3
-
-cc anykernel3/dtbtool.c -o out/arch/arm64/boot/dts/dtbtool
-( cd out/arch/arm64/boot/dts; dtbtool -v -s 2048 -o dt.img )
-
-( cd anykernel3; zip -r ../out/A37F_KERNEL_`date +%d\.%m\.%Y_%H\:%M\:%S`.zip . -x 'LICENSE' 'README.md' 'dtbtool.c' )
+case $1 in
+clean)
+make ARCH=arm64 -j4 clean mrproper
+;;
+dt)
+make lineageos_tomato_defconfig -j$(nproc --all)
+$DTBTOOL -2 -o $KERNEL_DIR/arch/arm64/boot/dt.img -s 2048 -p $KERNEL_DIR/scripts/dtc/ $KERNEL_DIR/arch/arm/boot/dts/
+;;
+*)
+compile_kernel
 
 BUILD_END=$(date +"%s")
 DIFF=$(($BUILD_END - $BUILD_START))
-echo -e "Build completed in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
+echo -e "$yellow Build completed in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds.$nocol"
+
+#ZIP MAKER time!
+echo "**** Verifying ZIP MAKER Directory ****"
+echo "**** Removing leftovers ****"
+rm -rf $ZIP_MAKER_DIR/tools/dt.img
+rm -rf $ZIP_MAKER_DIR/tools/Image
+#rm -rf $ZIP_MAKER_DIR/system/lib/modules/wlan.ko
+
+echo "**** Copying Image ****"
+cp $KERNEL_DIR/arch/arm64/boot/Image $ZIP_MAKER_DIR/tools/
+echo "**** Copying dtb ****"
+cp $KERNEL_DIR/arch/arm64/boot/dt.img $ZIP_MAKER_DIR/tools/
+#echo "**** Copying modules ****"
+#cp $KERNEL_DIR/drivers/staging/prima/wlan.ko $ZIP_MAKER_DIR/system/lib/modules/
+
+echo "**** Time to zip up! ****"
+cd $ZIP_MAKER_DIR/
+zip -r9 $FINAL_KERNEL_ZIP * -x $FINAL_KERNEL_ZIP
+;;
+esac
+
+echo "**** Good Bye!! ****"
+
