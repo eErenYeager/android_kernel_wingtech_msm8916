@@ -1486,15 +1486,15 @@ static const struct soc_enum msm_snd_enum[] = {
 	SOC_ENUM_SINGLE_EXT(6, pri_rx_sample_rate_text),
 	SOC_ENUM_SINGLE_EXT(6, mi2s_tx_sample_rate_text),
 	SOC_ENUM_SINGLE_EXT(2, mi2s_rx_sample_rate_text),
-<<<<<<< HEAD
+
 #ifdef CONFIG_MACH_T86519A1
 	SOC_ENUM_SINGLE_EXT(2, quatmi2s_clk_text),
-=======
+#endif
+
 #ifdef CONFIG_MACH_OPPO
 	/*xiang.fei@Multimedia, 2014/09/10, Add for yda145*/
 	SOC_ENUM_SINGLE_EXT(2, spk_pa_text),
 	/*xiang.fei@Multimedia, 2014/09/10, Add end*/
->>>>>>> f9aae6f218b... ASoC: msm: Update from 5.1 and cleanup
 #endif
 };
 
@@ -1589,11 +1589,7 @@ static int msm8x16_mclk_event(struct snd_soc_dapm_widget *w,
 	return 0;
 }
 
-<<<<<<< HEAD
-#ifdef CONFIG_MACH_CP8675
-=======
-#ifdef CONFIG_MACH_OPPO
->>>>>>> 46c9529d77a... ASoC: msm: Import OPPO changes
+#if defined CONFIG_MACH_CP8675 || defined CONFIG_MACH_OPPO
 static int msm8x16_dmic_event(struct snd_soc_dapm_widget *w,
 		struct snd_kcontrol *kcontrol, int event)
 {
@@ -1605,22 +1601,17 @@ static int msm8x16_dmic_event(struct snd_soc_dapm_widget *w,
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
 		ret = pinctrl_select_state(pinctrl_info.pinctrl,
-<<<<<<< HEAD
-				pinctrl_info.cdc_lines_dmic_act);
-=======
+
 				pinctrl_info.cdc_lines_act);
->>>>>>> 46c9529d77a... ASoC: msm: Import OPPO changes
 		if (ret < 0)
 			pr_err("%s: error during pinctrl state select\n",
 					__func__);
 		break;
 	case SND_SOC_DAPM_POST_PMD:
 		ret = pinctrl_select_state(pinctrl_info.pinctrl,
-<<<<<<< HEAD
-				pinctrl_info.cdc_lines_dmic_sus);
-=======
+
 				pinctrl_info.cdc_lines_sus);
->>>>>>> 46c9529d77a... ASoC: msm: Import OPPO changes
+
 		if (ret < 0)
 			pr_err("%s: error during pinctrl state select\n",
 					__func__);
@@ -2138,7 +2129,7 @@ static void *def_msm8x16_wcd_mbhc_cal(void)
 	 * 210-290 == Button 2
 	 * 360-680 == Button 3
 	 */
-<<<<<<< HEAD
+
 #ifdef CONFIG_MACH_JALEBI
 	btn_low[0] = 0;
 	btn_high[0] = 150;
@@ -2172,8 +2163,8 @@ static void *def_msm8x16_wcd_mbhc_cal(void)
 	btn_high[3] = 410;
 	btn_low[4] = 430;
 	btn_high[4] = 450;
-=======
-#ifdef CONFIG_MACH_OPPO
+
+#elif CONFIG_MACH_OPPO
 	btn_low[0] = 25;
 	btn_high[0] = 137;
 	btn_low[1] = 137;
@@ -2192,7 +2183,7 @@ static void *def_msm8x16_wcd_mbhc_cal(void)
 	else
 		btn_low[4] = 140;
 	btn_high[4] = 315;
->>>>>>> 46c9529d77a... ASoC: msm: Import OPPO changes
+
 #else
 	btn_low[0] = 75;
 	btn_high[0] = 75;
@@ -2622,7 +2613,7 @@ static struct snd_soc_dai_link msm8x16_wcd_dai[] = {
 		.stream_name = "Quaternary MI2S Playback",
 		.cpu_dai_name = "msm-dai-q6-mi2s.3",
 		.platform_name = "msm-pcm-routing",
-<<<<<<< HEAD
+
 #ifdef CONFIG_MACH_T86519A1
 		.codec_name = "vegas-codec",
 		.codec_dai_name = "vegas-aif1",
@@ -2630,12 +2621,11 @@ static struct snd_soc_dai_link msm8x16_wcd_dai[] = {
 		.dai_fmt = SND_SOC_DAIFMT_I2S
 			| SND_SOC_DAIFMT_NB_NF
 			| SND_SOC_DAIFMT_CBS_CFS,
-=======
-#if defined(CONFIG_MACH_15011) || \
+
+#elif defined(CONFIG_MACH_15011) || \
     defined(CONFIG_MACH_15018) || defined(CONFIG_MACH_15022)
 		.codec_dai_name = "tfa9890_codec_left",
 		.codec_name = "tfa9890.3-0036",
->>>>>>> 46c9529d77a... ASoC: msm: Import OPPO changes
 #else
 		.codec_dai_name = "snd-soc-dummy-dai",
 		.codec_name = "snd-soc-dummy",

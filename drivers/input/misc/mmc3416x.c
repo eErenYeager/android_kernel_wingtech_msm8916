@@ -723,7 +723,7 @@ static struct miscdevice mmc3416x_device = {
 	.fops = &mmc3416x_fops,
 };
 
-=======
+
 #ifdef CONFIG_MACH_OPPO
 static int mmc3416x_ft_test(struct mmc3416x_data *memsic)
 {
