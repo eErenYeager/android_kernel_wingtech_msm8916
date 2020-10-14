@@ -2277,15 +2277,14 @@ static void msm_hsusb_vbus_power(struct msm_otg *motg, bool on)
 #endif
 #if !defined(CONFIG_MACH_JALEBI) && !defined(CONFIG_YL_BQ24157_CHARGER) && !defined(CONFIG_YL_FAN5405_CHARGER)
 		ret = regulator_disable(vbus_otg);
-<<<<<<< HEAD
-=======
+#endif
+
 #ifdef CONFIG_MACH_OPPO
 		if (ret) {
 			msleep(10);
 			ret = regulator_disable(vbus_otg);
 			msleep(5);
 		}
->>>>>>> 42398d77cdc... usb: phy-msm-usb: Import OPPO changes
 #endif
 		if (ret) {
 			pr_err("unable to disable vbus_otg\n");
